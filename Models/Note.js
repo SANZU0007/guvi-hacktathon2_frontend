@@ -28,7 +28,7 @@ const noteSchema = new mongoose.Schema({
 
 noteSchema.set("toJSON", {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
+  
     delete returnedObject.id_id;
     delete returnedObject.__v;
   },
