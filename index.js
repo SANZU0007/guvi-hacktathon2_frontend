@@ -1,36 +1,122 @@
-const express = require('express')
+require('dotenv').config();
+
+const express = require("express");
 const app = express();
-let notes = [
-    {
-        id:1,
-        content:'html is easy',
-        important: true
-    },
-    {
-        id:2,
-        content:'backend applications using notejs',
-        important: false
-    },
-    {
-        id:3,
-        content:'get and post method important oh http',
-        important: true
-    }
-];
+const cors = require('cors');
+app.use(cors());
 
-app.get('/',((request,response)=>{
-    response.send('<h1>Notes app</h1>')
-
-}
-))
-app.get('/api/notes',((request,response)=>{
-    response.json(notes);
-}))
+app.use(express.json());
 
 
 
 
+//create model
+const Notes = require('./Models/Note')
 
-const PORT = 3001;
-app.listen(PORT);
-console.log(`server running port is ${PORT}`);
+
+
+//to store data d
+
+app.get("/", (request, response) => {
+  response.send("<h1>Notes app</h1>");
+});
+
+//fetch all resources is the note colection
+
+app.get("/api/notes", (request, response) => {
+  // Here, `notes` should be replaced with the actual data source (e.g., fetching notes from the database using the Note model)
+  Notes.find({}, {}).then((nodees) => {
+    response.json(nodees);
+  });
+});
+
+//create post reaquest
+
+app.post("/api/notes", (request, response) => {
+  const nodees = new Notes(request.body);
+  nodees
+    .save()
+
+    .then((result) => {
+      response.status(201).json({ messge: "note crated sucessfully" });
+    });
+});
+
+
+
+
+
+//fatching a single resource
+app.get('/api/notes/:id',(request,response)=>{
+  const id = request.params.id;
+Notes.findById(id)
+
+.then((nodee)=>{
+  if(!nodee){
+    return response.status(404).json({error:'note not found'})
+  }
+  response.json(nodee);
+
+
+})
+.catch((error)=>{
+  response.status(500).json({error:'internal server error'})
+})
+});
+
+
+
+
+
+
+//deleting a single resource
+app.delete('/api/notes/:id',(request,response)=>{
+  const id = request.params.id;
+Notes.findByIdAndDelete(id)
+
+.then((deleteNote)=>{
+  if(!deleteNote){
+    return response.status(404).json({error:'note not found'})
+  }
+  response.status(204).json({message:'note deleted sucees'})
+
+
+})
+.catch((error)=>{
+  response.status(500).json({error:'internal server error'})
+})
+});
+
+//put the data
+
+
+app.put('/api/notes/:id',(request,response)=>{
+  const id = request.params.id;
+  const notePut = request.body;
+Notes.findByIdAndUpdate(id,notePut)
+
+.then((updatedNote)=>{
+  if(!updatedNote){
+    return response.status(404).json({error:'note not found'})
+  }
+  response.json(updatedNote);
+
+
+})
+.catch((error)=>{
+  response.status(500).json({error:'internal server error'})
+})
+});
+
+
+
+
+
+
+
+  
+
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
