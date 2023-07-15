@@ -25,16 +25,16 @@ app.get("/", (request, response) => {
 
 app.get("/api/notes", (request, response) => {
   // Here, `notes` should be replaced with the actual data source (e.g., fetching notes from the database using the Note model)
-  Notes.find({}, {}).then((nodees) => {
-    response.json(nodees);
+  Notes.find({}, {}).then((notes) => {
+    response.json(notes);
   });
 });
 
 //create post reaquest
 
 app.post("/api/notes", (request, response) => {
-  const nodees = new Notes(request.body);
-  nodees
+  const notes = new Notes(request.body);
+  notes
     .save()
 
     .then((result) => {
@@ -51,8 +51,8 @@ app.get('/api/notes/:id',(request,response)=>{
   const id = request.params.id;
 Notes.findById(id)
 
-.then((nodee)=>{
-  if(!nodee){
+.then((note)=>{
+  if(!note){
     return response.status(404).json({error:'note not found'})
   }
   response.json(nodee);
